@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
-import { statusesRoutes } from './statuses.js';
+import { statusesRoutes } from './statuses';
+import { servicesRoutes } from './services';
 
 const API_PREFIX = '/api/v1';
 
@@ -9,5 +10,6 @@ const API_PREFIX = '/api/v1';
 export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
   await fastify.register(async function (fastify) {
     await fastify.register(statusesRoutes);
+    await fastify.register(servicesRoutes);
   }, { prefix: API_PREFIX });
 }

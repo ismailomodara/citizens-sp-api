@@ -1,3 +1,11 @@
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+  count?: number;
+}
+
 export enum Statuses {
   ACTIVE = 1,
   INACTIVE ,
@@ -14,31 +22,79 @@ export enum Statuses {
 
 export interface Status {
   id: number;
-  name: string;
+  label: string;
+  code: string;
   description: string | null;
   color: string | null;
   created_at: Date;
   updated_at: Date;
 }
 
-export interface CreateStatusInput {
-  name: string;
-  description?: string;
-  color?: string;
+export enum RequestTypes {
+  EDUCATION = 1,
+  HOUSING ,
+  ELECTRICITY,
+  FOOD,
+  HEALTHCARE,
+  TRANSPORTATION,
+  UTILITIES,
+  POLICE,
+  LEGAL,
+  SOCIAL_SERVICES,
+  MILITARY,
+  TAX,
+  OTHERS
 }
 
-export interface UpdateStatusInput {
-  name?: string;
-  description?: string;
-  color?: string;
+export interface Service {
+  id: number;
+  label: string;
+  code: string;
+  status_id: number
+  description: string | null;
+  created_at: Date;
+  updated_at: Date;
 }
 
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-  count?: number;
+export interface CreateServicePayload {
+  label: string;
+  code: string;
+  description?: string;
+  status_id: number
+}
+
+export interface UpdateServicePayload {
+  label?: string;
+  code?: string;
+  description?: string;
+  status_id?: number
+}
+
+export interface Office {
+  id: number;
+  label: string;
+  code: string;
+  address: string | null;
+  status_id: number;
+  country: string;
+  created_at: Date;
+  modified_at: Date;
+}
+
+export interface CreateOfficeInput {
+  label: string;
+  code: string;
+  address?: string;
+  status_id: number;
+  country: string;
+}
+
+export interface UpdateOfficeInput {
+  label?: string;
+  code?: string;
+  address?: string;
+  status_id?: number;
+  country?: string;
 }
 
 export interface EnvConfig {
