@@ -1,0 +1,11 @@
+node_modules/
+.env
+.DS_Store
+*.log
+dist/
+build/
+*.tsbuildinfo
+
+.idea/
+yarn.lock
+ENV_VARIABLES.md

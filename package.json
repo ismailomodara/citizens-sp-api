@@ -1,0 +1,35 @@
+{
+  "name": "citizens-sp-api",
+  "version": "1.0.0",
+  "description": "Fastify REST API with PostgreSQL",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc",
+    "migrate": "tsx src/migrations/migrate.ts",
+    "migrate:create": "tsx src/migrations/create-migration.ts"
+  },
+  "keywords": [
+    "fastify",
+    "postgres",
+    "rest-api",
+    "typescript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/env": "^4.2.0",
+    "dotenv": "^16.3.1",
+    "fastify": "^4.24.3",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "@types/pg": "^8.10.9",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
+
