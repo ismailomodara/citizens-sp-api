@@ -2,12 +2,14 @@ export enum Statuses {
   ACTIVE = 1,
   INACTIVE ,
   PENDING,
+  IN_PROGRESS,
   DELETED,
   APPROVED,
   REJECTED,
   ERROR,
   ENABLED,
-  DISABLED
+  DISABLED,
+  CONFIRMED
 }
 
 export interface Status {
