@@ -82,11 +82,6 @@ export interface UpdateServicePayload {
   status_id?: number
 }
 
-export enum Locales {
-  ENGLISH = 'EN',
-  ARABIC = 'AR'
-}
-
 export interface Locale {
   id: number;
   label: string;
@@ -119,29 +114,28 @@ export interface Citizen {
   lastname: string;
   country: string;
   status_id: number;
-  locale: string;
+  locale_id: number;
   created_at: Date;
   modified_at: Date;
 }
 
-export interface CreateCitizenInput {
+export interface CreateCitizenPayload {
   email: string;
   password: string;
-  firstname: string;
-  lastname: string;
+  firstname?: string;
+  lastname?: string;
   country: string;
-  status_id?: number;
-  locale?: string;
+  status_id: number;
+  locale_id: string;
 }
 
-export interface UpdateCitizenInput {
-  email?: string;
+export interface UpdateCitizenPayload {
   password?: string;
   firstname?: string;
   lastname?: string;
   country?: string;
   status_id?: number;
-  locale?: string;
+  locale_id?: string;
 }
 
 export interface Office {

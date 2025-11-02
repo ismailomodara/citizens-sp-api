@@ -39,7 +39,7 @@ CREATE INDEX IF NOT EXISTS idx_statuses_code ON statuses(code);
 CREATE OR REPLACE FUNCTION update_modified_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
-  NEW.moditifed_at = CURRENT_TIMESTAMP;
+  NEW.modified_at = CURRENT_TIMESTAMP;
   RETURN NEW;
 END;
 $$ language 'plpgsql';

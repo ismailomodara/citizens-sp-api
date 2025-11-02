@@ -12,9 +12,9 @@ CREATE TABLE IF NOT EXISTS locales (
 
 -- Insert initial statuses based on Statuses enum
 -- Ids map to Statuses Enum in Types
-INSERT INTO locales (label, code, description) VALUES
-('English', 'EN', 'The English locale'),
-('Arabic', 'AR', 'The Arabic locale')
+INSERT INTO locales (id, label, code, description) VALUES
+(1, 'English', 'EN', 'The English locale'),
+(2, 'Arabic', 'AR', 'The Arabic locale')
     ON CONFLICT (id) DO UPDATE SET
     label = EXCLUDED.label,
     code = EXCLUDED.code,

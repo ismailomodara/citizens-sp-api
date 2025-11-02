@@ -57,8 +57,7 @@ export async function pluck(id: string): Promise<ApiResponse<Locale>> {
  */
 export async function store(input: CreateLocalePayload): Promise<ApiResponse<Locale>> {
   try {
-    const { label, description } = input;
-    const code = label.toLowerCase().replaceAll(" ", "_");
+    const { label, code, description } = input;
 
     if (!label) {
       throw {
