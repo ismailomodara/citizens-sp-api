@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { query } from '../config/database.js';
-import { Citizen, CreateCitizenPayload, UpdateCitizenPayload, ApiResponse } from '../types';
+import {Citizen, CreateCitizenPayload, UpdateCitizenPayload, ApiResponse, Statuses, Locales} from '../types';
 
 const SALT_ROUNDS = 10;
 
@@ -118,7 +118,7 @@ export async function store(input: CreateCitizenPayload): Promise<ApiResponse<Ci
     
     const result = await query<Citizen>(
       'INSERT INTO citizens (email, password, firstname, lastname, country, status_id, locale_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-      [email.toLowerCase(), hashedPassword, firstname || null, lastname || null, country.toUpperCase(), status_id, locale_id]
+      [email.toLowerCase(), hashedPassword, firstname || null, lastname || null, country.toUpperCase(), status_id || Statuses.ENABLED, locale_id || Locales.ENGLISH]
     );
     
     return {

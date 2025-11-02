@@ -82,6 +82,11 @@ export interface UpdateServicePayload {
   status_id?: number
 }
 
+export enum Locales {
+  ENGLISH = 1,
+  ARABIC
+}
+
 export interface Locale {
   id: number;
   label: string;
@@ -107,7 +112,7 @@ export interface UpdateLocalePayload {
 }
 
 export interface Citizen {
-  id: string; // UUID
+  id: string; // UID
   email: string;
   password: string;
   firstname: string;
