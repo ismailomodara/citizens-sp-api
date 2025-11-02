@@ -12,20 +12,20 @@ CREATE TABLE IF NOT EXISTS services (
 
 -- Insert initial statuses based on Statuses enum
 -- Ids map to Statuses Enum in Types
-INSERT INTO services (id, label, code, description) VALUES
-   (1, 'Education', 'education', 'The education sector'),
-   (2, 'Housing', 'housing', 'The housing sector'),
-   (3, 'Electricity', 'electricity', 'The electricity sector'),
-   (4, 'Food', 'food', 'The food sector'),
-   (5, 'Healthcare', 'healthcare', 'The healthcare sector'),
-   (6, 'Transportation', 'transportation',  'The transportation sector'),
-   (7, 'Utilities', 'utilities', 'The utilities sector'),
-   (8, 'Police', 'police', 'The police sector'),
-   (9, 'Legal', 'legal', 'The legal sector'),
-   (10, 'Social Services', 'social_services', 'The social services sector'),
-   (11, 'Military', 'military', 'The military sector'),
-   (12, 'Tax', 'tax', 'The tax sector'),
-   (13, 'Others', 'others', 'The others sector')
+INSERT INTO services (label, code, description) VALUES
+   ('Education', 'education', 'The education sector'),
+   ('Housing', 'housing', 'The housing sector'),
+   ('Electricity', 'electricity', 'The electricity sector'),
+   ('Food', 'food', 'The food sector'),
+   ('Healthcare', 'healthcare', 'The healthcare sector'),
+   ('Transportation', 'transportation',  'The transportation sector'),
+   ('Utilities', 'utilities', 'The utilities sector'),
+   ('Police', 'police', 'The police sector'),
+   ('Legal', 'legal', 'The legal sector'),
+   ('Social Services', 'social_services', 'The social services sector'),
+   ('Military', 'military', 'The military sector'),
+   ('Tax', 'tax', 'The tax sector'),
+   ('Others', 'others', 'The others sector')
 ON CONFLICT (id) DO UPDATE SET
     label = EXCLUDED.label,
     code = EXCLUDED.code,

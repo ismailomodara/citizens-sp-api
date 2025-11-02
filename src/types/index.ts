@@ -1,3 +1,15 @@
+export interface EnvConfig {
+  DATABASE_URL: string;
+  PORT: string;
+  NODE_ENV: string;
+  HOST?: string;
+  LOG_LEVEL?: string;
+  DB_POOL_MIN?: string;
+  DB_POOL_MAX?: string;
+  DB_POOL_IDLE_TIMEOUT?: string;
+  DB_POOL_CONNECTION_TIMEOUT?: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -30,7 +42,7 @@ export interface Status {
   updated_at: Date;
 }
 
-export enum RequestTypes {
+export enum Services {
   EDUCATION = 1,
   HOUSING ,
   ELECTRICITY,
@@ -70,6 +82,68 @@ export interface UpdateServicePayload {
   status_id?: number
 }
 
+export enum Locales {
+  ENGLISH = 'EN',
+  ARABIC = 'AR'
+}
+
+export interface Locale {
+  id: number;
+  label: string;
+  code: string;
+  status_id: number
+  description: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface CreateLocalePayload {
+  label: string;
+  code: string;
+  description?: string;
+  status_id: number
+}
+
+export interface UpdateLocalePayload {
+  label?: string;
+  code?: string;
+  description?: string;
+  status_id?: number
+}
+
+export interface Citizen {
+  id: string; // UUID
+  email: string;
+  password: string;
+  firstname: string;
+  lastname: string;
+  country: string;
+  status_id: number;
+  locale: string;
+  created_at: Date;
+  modified_at: Date;
+}
+
+export interface CreateCitizenInput {
+  email: string;
+  password: string;
+  firstname: string;
+  lastname: string;
+  country: string;
+  status_id?: number;
+  locale?: string;
+}
+
+export interface UpdateCitizenInput {
+  email?: string;
+  password?: string;
+  firstname?: string;
+  lastname?: string;
+  country?: string;
+  status_id?: number;
+  locale?: string;
+}
+
 export interface Office {
   id: number;
   label: string;
@@ -96,16 +170,3 @@ export interface UpdateOfficeInput {
   status_id?: number;
   country?: string;
 }
-
-export interface EnvConfig {
-  DATABASE_URL: string;
-  PORT: string;
-  NODE_ENV: string;
-  HOST?: string;
-  LOG_LEVEL?: string;
-  DB_POOL_MIN?: string;
-  DB_POOL_MAX?: string;
-  DB_POOL_IDLE_TIMEOUT?: string;
-  DB_POOL_CONNECTION_TIMEOUT?: string;
-}
-
