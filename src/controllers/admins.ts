@@ -1,15 +1,15 @@
 import bcrypt from 'bcrypt';
 import { query } from '../config/database.js';
-import {Citizen, CreateCitizenPayload, UpdateCitizenPayload, ApiResponse, Statuses, Locales} from '../types';
+import {Admin, CreateAdminPayload, UpdateAdminPayload, ApiResponse, Statuses, Locales} from '../types';
 
 const SALT_ROUNDS = 10;
 
 /**
  * Get all citizens
  */
-export async function index(): Promise<ApiResponse<Citizen[]>> {
+export async function index(): Promise<ApiResponse<Admin[]>> {
   try {
-    const result = await query<Citizen>('SELECT * FROM citizens ORDER BY created_at DESC');
+    const result = await query<Admin>('SELECT * FROM admins ORDER BY created_at DESC');
     return {
       success: true,
       data: result.rows,
@@ -18,7 +18,7 @@ export async function index(): Promise<ApiResponse<Citizen[]>> {
   } catch (error) {
     throw {
       statusCode: 500,
-      message: 'Failed to fetch citizens',
+      message: 'Failed to fetch admins',
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
@@ -27,14 +27,14 @@ export async function index(): Promise<ApiResponse<Citizen[]>> {
 /**
  * Get a single citizen by ID
  */
-export async function pluck(id: string): Promise<ApiResponse<Citizen>> {
+export async function pluck(id: string): Promise<ApiResponse<Admin>> {
   try {
-    const result = await query<Citizen>('SELECT * FROM citizens WHERE id = $1', [id]);
+    const result = await query<Admin>('SELECT * FROM admins WHERE id = $1', [id]);
     
     if (result.rows.length === 0) {
       throw {
         statusCode: 404,
-        message: 'Citizen not found'
+        message: 'Admin not found'
       };
     }
     
@@ -49,7 +49,7 @@ export async function pluck(id: string): Promise<ApiResponse<Citizen>> {
     }
     throw {
       statusCode: 500,
-      message: 'Failed to fetch citizen',
+      message: 'Failed to fetch admin',
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
@@ -58,9 +58,9 @@ export async function pluck(id: string): Promise<ApiResponse<Citizen>> {
 /**
  * Create a new citizen
  */
-export async function store(input: CreateCitizenPayload): Promise<ApiResponse<Citizen>> {
+export async function store(input: CreateAdminPayload): Promise<ApiResponse<Admin>> {
   try {
-    const { email, password, firstname, lastname, country, status_id, locale_id } = input;
+    const { email, password, firstname, lastname, country, role_id, locale_id, status_id } = input;
     
     // Validation
     if (!email) throw { statusCode: 400, message: 'Email is required'};
@@ -91,6 +91,17 @@ export async function store(input: CreateCitizenPayload): Promise<ApiResponse<Ci
       };
     }
     
+    // Validate role_id
+    if (role_id) {
+      const roleCheck = await query('SELECT id FROM roles WHERE id = $1', [role_id]);
+      if (roleCheck.rows.length === 0) {
+        throw {
+          statusCode: 400,
+          message: 'Invalid role'
+        };
+      }
+    }
+
     // Validate locale_id
     if (locale_id) {
       const localeCheck = await query('SELECT id FROM locales WHERE id = $1', [locale_id]);
@@ -116,9 +127,9 @@ export async function store(input: CreateCitizenPayload): Promise<ApiResponse<Ci
     // Hash the password before storing
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     
-    const result = await query<Citizen>(
-      'INSERT INTO citizens (email, password, firstname, lastname, country, status_id, locale_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-      [email.toLowerCase(), hashedPassword, firstname || null, lastname || null, country.toUpperCase(), status_id || Statuses.ENABLED, locale_id || Locales.ENGLISH]
+    const result = await query<Admin>(
+      'INSERT INTO citizens (email, password, firstname, lastname, country, role_id, status_id, locale_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [email.toLowerCase(), hashedPassword, firstname || null, lastname || null, country.toUpperCase(), role_id, status_id || Statuses.ENABLED, locale_id || Locales.ENGLISH]
     );
     
     return {
@@ -134,23 +145,32 @@ export async function store(input: CreateCitizenPayload): Promise<ApiResponse<Ci
     if (error.code === '23505') { // Unique violation
       throw {
         statusCode: 409,
-        message: 'Citizen with this email already exists'
+        message: 'Admin with this email already exists'
       };
     }
-
+    
     if (error.code === '23503') { // Foreign key violation
       throw {
         statusCode: 400,
         message: `Invalid ${error.constraint.split("_")[-1]}`
       };
     }
-    
+
     if (error.code === '23514') { // Check constraint violation
       throw {
         statusCode: 400,
         error: error.constraint,
         message: error.constraint === 'chk_citizens_country_length' ?
           'Country must be a valid ISO3 code (3 characters)' : '-'
+      };
+    }
+
+    if (error.code === '23514') { // Check constraint violation
+      throw {
+        statusCode: 400,
+        error: error.constraint,
+        message: error.constraint === 'chk_citizens_country_length'
+          ? 'Country must be a valid ISO3 code (3 characters)' : ''
       };
     }
     
@@ -165,7 +185,7 @@ export async function store(input: CreateCitizenPayload): Promise<ApiResponse<Ci
 /**
  * Update a citizen
  */
-export async function update(id: string, input: UpdateCitizenPayload): Promise<ApiResponse<Citizen>> {
+export async function update(id: string, input: UpdateAdminPayload): Promise<ApiResponse<Admin>> {
   try {
     const { password, firstname, lastname, country, status_id, locale_id } = input;
     
@@ -240,7 +260,7 @@ export async function update(id: string, input: UpdateCitizenPayload): Promise<A
     }
     
     values.push(id);
-    const result = await query<Citizen>(
+    const result = await query<Admin>(
       `UPDATE citizens SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
       values
     );
@@ -248,7 +268,7 @@ export async function update(id: string, input: UpdateCitizenPayload): Promise<A
     if (result.rows.length === 0) {
       throw {
         statusCode: 404,
-        message: 'Citizen not found'
+        message: 'Admin not found'
       };
     }
     
@@ -265,20 +285,21 @@ export async function update(id: string, input: UpdateCitizenPayload): Promise<A
     if (error.code === '23505') { // Unique violation
       throw {
         statusCode: 409,
-        message: 'Citizen with this email already exists'
+        message: 'Admin with this email already exists'
       };
     }
-    
+
     if (error.code === '23503') { // Foreign key violation
       throw {
         statusCode: 400,
-        message: 'Invalid status or locale'
+        message: `Invalid ${error.constraint.split("_")[-1]}`
       };
     }
     
     if (error.code === '23514') { // Check constraint violation
       throw {
         statusCode: 400,
+        error: error.constraint,
         message: error.constraint === 'chk_citizens_country_length'
           ? 'Country must be a valid ISO3 code (3 characters)' : ''
       };
@@ -295,9 +316,9 @@ export async function update(id: string, input: UpdateCitizenPayload): Promise<A
 /**
  * Delete a citizen
  */
-export async function destroy(id: string): Promise<ApiResponse<Citizen>> {
+export async function destroy(id: string): Promise<ApiResponse<Admin>> {
   try {
-    const result = await query<Citizen>('DELETE FROM citizens WHERE id = $1 RETURNING *', [id]);
+    const result = await query<Admin>('DELETE FROM citizens WHERE id = $1 RETURNING *', [id]);
     
     if (result.rows.length === 0) {
       throw {

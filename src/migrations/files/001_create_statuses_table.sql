@@ -22,7 +22,8 @@ INSERT INTO statuses (id, label, code, description, color) VALUES
   (8, 'Error', 'error', 'Status for items with errors', 'red'),
   (9, 'Enabled', 'enabled', 'Status for enabled items', 'green'),
   (10, 'Disabled', 'disabled', 'Status for disabled items', 'red'),
-  (11, 'Confirmed', 'confirmed', 'Status for approved items', 'green')
+  (11, 'Confirmed', 'confirmed', 'Status for approved items', 'yello'),
+  (12, 'Invited', 'invited', 'Status for invited items', 'green')
 ON CONFLICT (id) DO UPDATE SET
   label = EXCLUDED.label,
   code = EXCLUDED.code,

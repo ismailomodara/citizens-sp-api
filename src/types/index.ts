@@ -29,7 +29,8 @@ export enum Statuses {
   ERROR,
   ENABLED,
   DISABLED,
-  CONFIRMED
+  CONFIRMED,
+  INVITED
 }
 
 export interface Status {
@@ -220,4 +221,39 @@ export interface CreateRolePermissionPayload {
 export interface UpdateRolePermissionPayload {
   role_id?: number;
   permission_id?: number;
+}
+
+export interface Admin {
+  id: string; // UID
+  email: string;
+  password: string;
+  firstname: string;
+  lastname: string;
+  country: string;
+  role_id: number;
+  locale_id: number;
+  status_id: number;
+  created_at: Date;
+  modified_at: Date;
+}
+
+export interface CreateAdminPayload {
+  email: string;
+  password: string;
+  firstname?: string;
+  lastname?: string;
+  country: string;
+  role_id: number;
+  locale_id: string;
+  status_id: number;
+}
+
+export interface UpdateAdminPayload {
+  password?: string;
+  firstname?: string;
+  lastname?: string;
+  country?: string;
+  role_id?: number;
+  locale_id?: string;
+  status_id?: number;
 }

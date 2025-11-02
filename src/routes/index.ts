@@ -6,6 +6,7 @@ import { authRoutes } from "./auth";
 import { citizensRoutes } from './citizens';
 import { rolesRoutes } from './roles';
 import { permissionsRoutes } from './permissions';
+import { adminsRoutes } from "./admins";
 
 const API_PREFIX = '/api/v1';
 
@@ -21,5 +22,6 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
     await fastify.register(citizensRoutes);
     await fastify.register(rolesRoutes);
     await fastify.register(permissionsRoutes);
+    await fastify.register(adminsRoutes);
   }, { prefix: API_PREFIX });
 }
