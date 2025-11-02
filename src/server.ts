@@ -1,8 +1,11 @@
+import { config } from 'dotenv';
 import Fastify, { FastifyInstance } from 'fastify';
 import env from '@fastify/env';
-import { statusesRoutes } from './routes/statuses.js';
+import { registerRoutes } from './routes';
 import { getPool } from './config/database.js';
-import { EnvConfig } from './types';
+
+// Load environment variables from .env file before Fastify initialization
+config();
 
 const schema = {
   type: 'object',
@@ -58,8 +61,8 @@ const fastify: FastifyInstance = Fastify({
 // Register environment variables plugin
 await fastify.register(env, options);
 
-// Health check route
-fastify.get('/health', async (request, reply) => {
+// Health check route (under /api/v1 prefix)
+fastify.get('/api/v1/health', async (_request, reply) => {
   try {
     // Test database connection
     const pool = getPool();
@@ -80,11 +83,11 @@ fastify.get('/health', async (request, reply) => {
   }
 });
 
-// Register routes
-fastify.register(statusesRoutes);
+// Register all routes
+await registerRoutes(fastify);
 
-// Root route
-fastify.get('/', async (request, reply) => {
+// Root API route (under /api/v1 prefix)
+fastify.get('/api/v1', async (_request, _reply) => {
   return {
     message: 'Citizens SP API',
     version: '1.0.0',
@@ -98,9 +101,9 @@ fastify.get('/', async (request, reply) => {
 // Start server
 const start = async (): Promise<void> => {
   try {
-    const config = fastify.config as EnvConfig;
-    const port = parseInt(config.PORT, 10) || 3000;
-    const host = process.env.HOST || '0.0.0.0';
+    // After registering @fastify/env, the config is available on fastify instance
+    const port = parseInt(process.env.PORT || '3000', 10);
+    const host = process.env.DB_HOST || '0.0.0.0';
     await fastify.listen({ port, host });
     console.log(`🚀 Server is running on http://${host}:${port}`);
   } catch (err) {

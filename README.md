@@ -30,14 +30,14 @@ A Fastify REST API with PostgreSQL database support, built with TypeScript.
    
    Minimum required configuration:
    ```env
-   DATABASE_URL=postgresql://username:password@localhost:5432/citizens_db
+   DATABASE_URL=postgresql://username:password@localhost:5432/citizens_sp
    PORT=3000
    NODE_ENV=development
    ```
 
 3. **Create the database:**
    ```bash
-   createdb citizens_db
+   createdb citizens_sp
    ```
    Or use your preferred method to create a PostgreSQL database.
 
