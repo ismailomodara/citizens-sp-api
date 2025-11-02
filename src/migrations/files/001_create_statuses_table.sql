@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS statuses (
   description TEXT,
   color VARCHAR(16),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  moditifed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Insert initial statuses based on Statuses enum
@@ -27,7 +27,7 @@ ON CONFLICT (id) DO UPDATE SET
   label = EXCLUDED.label,
   code = EXCLUDED.code,
   description = EXCLUDED.description,
-  moditifed_at = CURRENT_TIMESTAMP;
+  modified_at = CURRENT_TIMESTAMP;
 
 -- Reset the sequence to continue after the highest ID
 SELECT setval('statuses_id_seq', (SELECT MAX(id) FROM statuses));

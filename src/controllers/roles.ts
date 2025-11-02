@@ -1,12 +1,12 @@
 import { query } from '../config/database.js';
-import { Office, CreateOfficeInput, UpdateOfficeInput, ApiResponse } from '../types';
+import { Role, CreateRolePayload, UpdateRolePayload, ApiResponse, Statuses } from '../types';
 
 /**
- * Get all offices
+ * Get all roles
  */
-export async function index(): Promise<ApiResponse<Office[]>> {
+export async function index(): Promise<ApiResponse<Role[]>> {
   try {
-    const result = await query<Office>('SELECT * FROM offices ORDER BY id');
+    const result = await query<Role>('SELECT * FROM roles ORDER BY id');
     return {
       success: true,
       data: result.rows,
@@ -15,23 +15,23 @@ export async function index(): Promise<ApiResponse<Office[]>> {
   } catch (error) {
     throw {
       statusCode: 500,
-      message: 'Failed to fetch offices',
+      message: 'Failed to fetch roles',
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 }
 
 /**
- * Get a single office by ID
+ * Get a single role by ID
  */
-export async function pluck(id: string): Promise<ApiResponse<Office>> {
+export async function pluck(id: string): Promise<ApiResponse<Role>> {
   try {
-    const result = await query<Office>('SELECT * FROM offices WHERE id = $1', [id]);
+    const result = await query<Role>('SELECT * FROM roles WHERE id = $1', [id]);
     
     if (result.rows.length === 0) {
       throw {
         statusCode: 404,
-        message: 'Office not found'
+        message: 'Role not found'
       };
     }
     
@@ -40,24 +40,23 @@ export async function pluck(id: string): Promise<ApiResponse<Office>> {
       data: result.rows[0]
     };
   } catch (error: any) {
-    // Re-throw if it's already our formatted error
     if (error.statusCode) {
       throw error;
     }
     throw {
       statusCode: 500,
-      message: 'Failed to fetch office',
+      message: 'Failed to fetch role',
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 }
 
 /**
- * Create a new office
+ * Create a new role
  */
-export async function store(input: CreateOfficeInput): Promise<ApiResponse<Office>> {
+export async function store(input: CreateRolePayload): Promise<ApiResponse<Role>> {
   try {
-    const { label, code, address, status_id, country } = input;
+    const { label, code, description, status_id } = input;
     
     if (!label) {
       throw {
@@ -66,39 +65,23 @@ export async function store(input: CreateOfficeInput): Promise<ApiResponse<Offic
       };
     }
     
-    if (!code) {
-      throw {
-        statusCode: 400,
-        message: 'Code is required'
-      };
+    // Generate code from label if not provided
+    const finalCode = code || label.toLowerCase().replace(/\s+/g, '_');
+    
+    // Validate status_id if provided
+    if (status_id) {
+      const statusCheck = await query('SELECT id FROM statuses WHERE id = $1', [status_id]);
+      if (statusCheck.rows.length === 0) {
+        throw {
+          statusCode: 400,
+          message: 'Invalid status_id'
+        };
+      }
     }
     
-    if (!status_id) {
-      throw {
-        statusCode: 400,
-        message: 'Status ID is required'
-      };
-    }
-    
-    if (!country || country.length !== 3) {
-      throw {
-        statusCode: 400,
-        message: 'Country must be a valid ISO3 code (3 characters)'
-      };
-    }
-    
-    // Validate status_id exists
-    const statusCheck = await query('SELECT id FROM statuses WHERE id = $1', [status_id]);
-    if (statusCheck.rows.length === 0) {
-      throw {
-        statusCode: 400,
-        message: 'Invalid status_id'
-      };
-    }
-    
-    const result = await query<Office>(
-      'INSERT INTO offices (label, code, address, status_id, country) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [label, code, address || null, status_id, country.toUpperCase()]
+    const result = await query<Role>(
+      'INSERT INTO roles (label, code, description, status_id) VALUES ($1, $2, $3, $4) RETURNING *',
+      [label, finalCode, description || null, status_id || Statuses.ACTIVE]
     );
     
     return {
@@ -106,7 +89,6 @@ export async function store(input: CreateOfficeInput): Promise<ApiResponse<Offic
       data: result.rows[0]
     };
   } catch (error: any) {
-    // Re-throw if it's already our formatted error
     if (error.statusCode) {
       throw error;
     }
@@ -114,7 +96,7 @@ export async function store(input: CreateOfficeInput): Promise<ApiResponse<Offic
     if (error.code === '23505') { // Unique violation
       throw {
         statusCode: 409,
-        message: 'Office with this code already exists'
+        message: 'Role with this code already exists'
       };
     }
     
@@ -127,18 +109,18 @@ export async function store(input: CreateOfficeInput): Promise<ApiResponse<Offic
     
     throw {
       statusCode: 500,
-      message: 'Failed to create office',
+      message: 'Failed to create role',
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 }
 
 /**
- * Update an office
+ * Update a role
  */
-export async function update(id: string, input: UpdateOfficeInput): Promise<ApiResponse<Office>> {
+export async function update(id: string, input: UpdateRolePayload): Promise<ApiResponse<Role>> {
   try {
-    const { label, code, address, status_id, country } = input;
+    const { label, code, description, status_id } = input;
     
     const updates: string[] = [];
     const values: any[] = [];
@@ -147,15 +129,24 @@ export async function update(id: string, input: UpdateOfficeInput): Promise<ApiR
     if (label !== undefined) {
       updates.push(`label = $${paramCount++}`);
       values.push(label);
+      // Update code if label changed and code not explicitly provided
+      if (code === undefined) {
+        const generatedCode = label.toLowerCase().replace(/\s+/g, '_');
+        updates.push(`code = $${paramCount++}`);
+        values.push(generatedCode);
+      }
     }
+    
     if (code !== undefined) {
       updates.push(`code = $${paramCount++}`);
       values.push(code);
     }
-    if (address !== undefined) {
-      updates.push(`address = $${paramCount++}`);
-      values.push(address);
+    
+    if (description !== undefined) {
+      updates.push(`description = $${paramCount++}`);
+      values.push(description);
     }
+    
     if (status_id !== undefined) {
       // Validate status_id exists
       const statusCheck = await query('SELECT id FROM statuses WHERE id = $1', [status_id]);
@@ -168,16 +159,6 @@ export async function update(id: string, input: UpdateOfficeInput): Promise<ApiR
       updates.push(`status_id = $${paramCount++}`);
       values.push(status_id);
     }
-    if (country !== undefined) {
-      if (country.length !== 3) {
-        throw {
-          statusCode: 400,
-          message: 'Country must be a valid ISO3 code (3 characters)'
-        };
-      }
-      updates.push(`country = $${paramCount++}`);
-      values.push(country.toUpperCase());
-    }
     
     if (updates.length === 0) {
       throw {
@@ -187,15 +168,15 @@ export async function update(id: string, input: UpdateOfficeInput): Promise<ApiR
     }
     
     values.push(id);
-    const result = await query<Office>(
-      `UPDATE offices SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+    const result = await query<Role>(
+      `UPDATE roles SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
       values
     );
     
     if (result.rows.length === 0) {
       throw {
         statusCode: 404,
-        message: 'Office not found'
+        message: 'Role not found'
       };
     }
     
@@ -204,7 +185,6 @@ export async function update(id: string, input: UpdateOfficeInput): Promise<ApiR
       data: result.rows[0]
     };
   } catch (error: any) {
-    // Re-throw if it's already our formatted error
     if (error.statusCode) {
       throw error;
     }
@@ -212,7 +192,7 @@ export async function update(id: string, input: UpdateOfficeInput): Promise<ApiR
     if (error.code === '23505') { // Unique violation
       throw {
         statusCode: 409,
-        message: 'Office with this code already exists'
+        message: 'Role with this code already exists'
       };
     }
     
@@ -225,40 +205,39 @@ export async function update(id: string, input: UpdateOfficeInput): Promise<ApiR
     
     throw {
       statusCode: 500,
-      message: 'Failed to update office',
+      message: 'Failed to update role',
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 }
 
 /**
- * Delete an office
+ * Delete a role
  */
-export async function destroy(id: string): Promise<ApiResponse<Office>> {
+export async function destroy(id: string): Promise<ApiResponse<Role>> {
   try {
-    const result = await query<Office>('DELETE FROM offices WHERE id = $1 RETURNING *', [id]);
+    const result = await query<Role>('DELETE FROM roles WHERE id = $1 RETURNING *', [id]);
     
     if (result.rows.length === 0) {
       throw {
         statusCode: 404,
-        message: 'Office not found'
+        message: 'Role not found'
       };
     }
     
     return {
       success: true,
-      message: 'Office deleted successfully',
+      message: 'Role deleted successfully',
       data: result.rows[0]
     };
   } catch (error: any) {
-    // Re-throw if it's already our formatted error
     if (error.statusCode) {
       throw error;
     }
     
     throw {
       statusCode: 500,
-      message: 'Failed to delete office',
+      message: 'Failed to delete role',
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }

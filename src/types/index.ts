@@ -143,29 +143,81 @@ export interface UpdateCitizenPayload {
   locale_id?: string;
 }
 
-export interface Office {
+export enum Roles {
+  SYSTEM_ADMIN = 1,
+  SENIOR_OFFICER ,
+  OFFICER_LEVEL_2,
+  OFFICER_LEVEL_1
+}
+
+export interface Role {
   id: number;
   label: string;
   code: string;
-  address: string | null;
+  description: string | null;
   status_id: number;
-  country: string;
   created_at: Date;
   modified_at: Date;
 }
 
-export interface CreateOfficeInput {
+export interface CreateRolePayload {
   label: string;
-  code: string;
-  address?: string;
-  status_id: number;
-  country: string;
+  code?: string;
+  description?: string;
+  status_id?: number;
 }
 
-export interface UpdateOfficeInput {
+export interface UpdateRolePayload {
   label?: string;
   code?: string;
-  address?: string;
+  description?: string;
   status_id?: number;
-  country?: string;
+}
+
+export interface Permission {
+  id: number;
+  label: string;
+  code: string;
+  entity_code: string;
+  action: string;
+  description: string | null;
+  status_id: number;
+  created_at: Date;
+  modified_at: Date;
+}
+
+export interface CreatePermissionPayload {
+  label: string;
+  code?: string;
+  entity_code: string;
+  action: string;
+  description?: string;
+  status_id?: number;
+}
+
+export interface UpdatePermissionPayload {
+  label?: string;
+  code?: string;
+  entity_code?: string;
+  action?: string;
+  description?: string;
+  status_id?: number;
+}
+
+export interface RolePermission {
+  id: number;
+  role_id: number;
+  permission_id: number;
+  created_at: Date;
+  modified_at: Date;
+}
+
+export interface CreateRolePermissionPayload {
+  role_id: number;
+  permission_id: number;
+}
+
+export interface UpdateRolePermissionPayload {
+  role_id?: number;
+  permission_id?: number;
 }
