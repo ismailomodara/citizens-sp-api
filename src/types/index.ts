@@ -214,7 +214,7 @@ export interface Admin {
   password: string;
   firstname: string;
   lastname: string;
-  country: string;
+  country_code: string;
   role_id: number;
   locale_id: number;
   status_id: number;
@@ -227,7 +227,7 @@ export interface CreateAdminPayload {
   password: string;
   firstname?: string;
   lastname?: string;
-  country: string;
+  country_code: string;
   role_id: number;
   locale_id: string;
   status_id: number;
@@ -237,7 +237,7 @@ export interface UpdateAdminPayload {
   password?: string;
   firstname?: string;
   lastname?: string;
-  country?: string;
+  country_code?: string;
   role_id?: number;
   locale_id?: string;
   status_id?: number;
@@ -274,7 +274,7 @@ export interface Citizen {
   password: string;
   firstname: string;
   lastname: string;
-  country: string;
+  country_code: string;
   status_id: number;
   locale_id: number;
   created_at: Date;
@@ -286,7 +286,7 @@ export interface CreateCitizenPayload {
   password: string;
   firstname?: string;
   lastname?: string;
-  country: string;
+  country_code: string;
   status_id: number;
   locale_id: string;
 }
@@ -295,7 +295,7 @@ export interface UpdateCitizenPayload {
   password?: string;
   firstname?: string;
   lastname?: string;
-  country?: string;
+  country_code?: string;
   status_id?: number;
   locale_id?: string;
 }
