@@ -13,9 +13,11 @@ CREATE TABLE IF NOT EXISTS roles (
 -- Insert default roles
 INSERT INTO roles (id, label, code, description) VALUES
   (1, 'System Admin', 'system_admin', 'System administrator with full permissions'),
-  (2, 'Senior Officer', 'senior_officer', 'Senior officer with advanced permissions'),
-  (3, 'Officer Level 2', 'officer_level_2', 'Mid-level officer with extended permissions'),
-  (4, 'Officer Level 1', 'officer_level_1', 'Entry-level officer with basic permissions')
+  (2, 'Regional Admin', 'regional_admin', 'Regional administrator with full permissions specific to a region (country)'),
+  (3, 'Admin', 'admin', 'Admins to handle activities based on assigned region, under a regional admin'),
+  (4, 'Senior Officer', 'senior_officer', 'Senior officer with advanced permissions'),
+  (5, 'Officer Level 2', 'officer_level_2', 'Mid-level officer with extended permissions'),
+  (6, 'Officer Level 1', 'officer_level_1', 'Entry-level officer with basic permissions')
 ON CONFLICT (id) DO UPDATE SET
   label = EXCLUDED.label,
   code = EXCLUDED.code,

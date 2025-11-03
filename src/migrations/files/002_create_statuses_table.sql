@@ -12,18 +12,18 @@ CREATE TABLE IF NOT EXISTS statuses (
 -- Insert initial statuses based on Statuses enum
 -- Ids map to Statuses Enum in Types
 INSERT INTO statuses (id, label, code, description, color) VALUES
-  (1, 'Active', 'active', 'Status for active items', 'green'),
-  (2, 'Inactive', 'inactive', 'Status for inactive items', 'gray'),
-  (3, 'Pending', 'pending', 'Status for pending items', 'yellow'),
-  (4, 'In Progress', 'in_progress',  'Status for in progress items', 'yellow'),
-  (5, 'Deleted', 'deleted', 'Status for deleted items', 'red'),
-  (6, 'Approved', 'approved', 'Status for approved items', 'green'),
-  (7, 'Rejected', 'rejected', 'Status for rejected items', 'red'),
-  (8, 'Error', 'error', 'Status for items with errors', 'red'),
-  (9, 'Enabled', 'enabled', 'Status for enabled items', 'green'),
-  (10, 'Disabled', 'disabled', 'Status for disabled items', 'red'),
-  (11, 'Confirmed', 'confirmed', 'Status for approved items', 'yello'),
-  (12, 'Invited', 'invited', 'Status for invited items', 'green')
+  (1, 'Active', 'active', 'Status for active items', 'success'),
+  (2, 'Inactive', 'inactive', 'Status for inactive items', 'info'),
+  (3, 'Pending', 'pending', 'Status for pending items', 'warning'),
+  (4, 'In Progress', 'in_progress',  'Status for in progress items', 'warning'),
+  (5, 'Deleted', 'deleted', 'Status for deleted items', 'danger'),
+  (6, 'Approved', 'approved', 'Status for approved items', 'success'),
+  (7, 'Rejected', 'rejected', 'Status for rejected items', 'danger'),
+  (8, 'Error', 'error', 'Status for items with errors', 'danger'),
+  (9, 'Enabled', 'enabled', 'Status for enabled items', 'success'),
+  (10, 'Disabled', 'disabled', 'Status for disabled items', 'danger'),
+  (11, 'Confirmed', 'confirmed', 'Status for approved items', 'success'),
+  (12, 'Invited', 'invited', 'Status for invited items', 'warning')
 ON CONFLICT (id) DO UPDATE SET
   label = EXCLUDED.label,
   code = EXCLUDED.code,

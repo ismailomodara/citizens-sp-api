@@ -18,6 +18,21 @@ export interface ApiResponse<T> {
   count?: number;
 }
 
+export enum Entities {
+  STATUSES = 'entity.statuses',
+  SERVICES = 'entity.services',
+  LOCALES = 'entity.locales',
+  ROLES = 'entity.roles',
+  PERMISSIONS = 'entity.permissions',
+  ROLES_PERMISSIONS = 'entity.roles_permissions',
+  ADMINS = 'entity.admins',
+  COUNTRIES = 'entity.countries',
+  MINISTRIES = 'entity.ministries',
+  MINISTRIES_ADMINS = 'entity.ministries_admins',
+  CITIZENS = 'entity.citizens',
+  REQUESTS = 'entity.requests'
+}
+
 export enum Statuses {
   ACTIVE = 1,
   INACTIVE ,
@@ -38,7 +53,7 @@ export interface Status {
   label: string;
   code: string;
   description: string | null;
-  color: string | null;
+  color: string | 'info';
   created_at: Date;
   updated_at: Date;
 }
@@ -63,8 +78,8 @@ export interface Service {
   id: number;
   label: string;
   code: string;
-  status_id: number
   description: string | null;
+  status_id: number
   created_at: Date;
   updated_at: Date;
 }
@@ -73,7 +88,7 @@ export interface CreateServicePayload {
   label: string;
   code: string;
   description?: string;
-  status_id: number
+  status_id?: number
 }
 
 export interface UpdateServicePayload {
@@ -102,7 +117,7 @@ export interface CreateLocalePayload {
   label: string;
   code: string;
   description?: string;
-  status_id: number
+  status_id?: number
 }
 
 export interface UpdateLocalePayload {
@@ -112,40 +127,10 @@ export interface UpdateLocalePayload {
   status_id?: number
 }
 
-export interface Citizen {
-  id: string; // UID
-  email: string;
-  password: string;
-  firstname: string;
-  lastname: string;
-  country: string;
-  status_id: number;
-  locale_id: number;
-  created_at: Date;
-  modified_at: Date;
-}
-
-export interface CreateCitizenPayload {
-  email: string;
-  password: string;
-  firstname?: string;
-  lastname?: string;
-  country: string;
-  status_id: number;
-  locale_id: string;
-}
-
-export interface UpdateCitizenPayload {
-  password?: string;
-  firstname?: string;
-  lastname?: string;
-  country?: string;
-  status_id?: number;
-  locale_id?: string;
-}
-
 export enum Roles {
   SYSTEM_ADMIN = 1,
+  REGIONAL_ADMIN ,
+  ADMIN,
   SENIOR_OFFICER ,
   OFFICER_LEVEL_2,
   OFFICER_LEVEL_1
@@ -256,4 +241,61 @@ export interface UpdateAdminPayload {
   role_id?: number;
   locale_id?: string;
   status_id?: number;
+}
+
+export interface Country {
+  id: string; // UID
+  name: string;
+  code: string;
+  description: string;
+  status_id: number;
+  creator_admin_id: number;
+  assigned_admin_id: number;
+  created_at: Date;
+  modified_at: Date;
+}
+
+export interface CreateCountryPayload {
+  name: string;
+  code: string;
+  description: string;
+  creator_admin_id: number;
+  assigned_admin_id: number | null;
+}
+
+export interface UpdateCountryPayload {
+  description?: string;
+  assigned_admin_id?: number | null;
+}
+
+export interface Citizen {
+  id: string; // UID
+  email: string;
+  password: string;
+  firstname: string;
+  lastname: string;
+  country: string;
+  status_id: number;
+  locale_id: number;
+  created_at: Date;
+  modified_at: Date;
+}
+
+export interface CreateCitizenPayload {
+  email: string;
+  password: string;
+  firstname?: string;
+  lastname?: string;
+  country: string;
+  status_id: number;
+  locale_id: string;
+}
+
+export interface UpdateCitizenPayload {
+  password?: string;
+  firstname?: string;
+  lastname?: string;
+  country?: string;
+  status_id?: number;
+  locale_id?: string;
 }
