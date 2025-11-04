@@ -243,3 +243,185 @@ export async function destroy(id: string): Promise<ApiResponse<Role>> {
   }
 }
 
+/**
+ * Get all permissions for a specific role
+ * Returns readable permission data by joining roles_permissions with permissions
+ */
+export async function getRolePermissions(roleId: string): Promise<ApiResponse<any[]>> {
+  try {
+    // First verify the role exists
+    const roleCheck = await query('SELECT id FROM roles WHERE id = $1', [roleId]);
+    if (roleCheck.rows.length === 0) {
+      throw {
+        statusCode: 404,
+        message: 'Role not found'
+      };
+    }
+
+    // Join roles_permissions with permissions to get readable data
+    const result = await query(`
+      SELECT 
+        rp.id,
+        rp.role_id,
+        rp.permission_id,
+        p.code as permission_code,
+        p.label as permission_label,
+        p.entity_code,
+        p.action,
+        p.description as permission_description,
+        p.status_id as permission_status_id,
+        rp.created_at,
+        rp.modified_at
+      FROM roles_permissions rp
+      INNER JOIN permissions p ON rp.permission_id = p.id
+      WHERE rp.role_id = $1
+      ORDER BY p.entity_code, p.action
+    `, [roleId]);
+
+    return {
+      success: true,
+      data: result.rows,
+      count: result.rows.length
+    };
+  } catch (error: any) {
+    if (error.statusCode) {
+      throw error;
+    }
+    throw {
+      statusCode: 500,
+      message: 'Failed to fetch role permissions',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+}
+
+/**
+ * Update the status of a role permission (enable/disable)
+ * Since roles_permissions doesn't have a status_id column,
+ * we enable by inserting and disable by deleting
+ */
+export async function updateRolePermissionStatus(
+  roleId: string,
+  permissionId: number,
+  enabled: boolean
+): Promise<ApiResponse<any>> {
+  try {
+    // Verify role exists
+    const roleCheck = await query('SELECT id FROM roles WHERE id = $1', [roleId]);
+    if (roleCheck.rows.length === 0) {
+      throw {
+        statusCode: 404,
+        message: 'Role not found'
+      };
+    }
+
+    // Verify permission exists
+    const permissionCheck = await query('SELECT id FROM permissions WHERE id = $1', [permissionId]);
+    if (permissionCheck.rows.length === 0) {
+      throw {
+        statusCode: 404,
+        message: 'Permission not found'
+      };
+    }
+
+    if (enabled) {
+      // Enable: Insert into roles_permissions if not exists
+      const result = await query(`
+        INSERT INTO roles_permissions (role_id, permission_id)
+        VALUES ($1, $2)
+        ON CONFLICT (role_id, permission_id) DO NOTHING
+        RETURNING *
+      `, [roleId, permissionId]);
+
+      if (result.rows.length === 0) {
+        // Already exists, fetch it
+        const existing = await query(`
+          SELECT 
+            rp.id,
+            rp.role_id,
+            rp.permission_id,
+            p.code as permission_code,
+            p.label as permission_label,
+            p.entity_code,
+            p.action,
+            p.description as permission_description,
+            p.status_id as permission_status_id,
+            rp.created_at,
+            rp.modified_at
+          FROM roles_permissions rp
+          INNER JOIN permissions p ON rp.permission_id = p.id
+          WHERE rp.role_id = $1 AND rp.permission_id = $2
+        `, [roleId, permissionId]);
+
+        return {
+          success: true,
+          message: 'Permission already enabled for this role',
+          data: existing.rows[0]
+        };
+      }
+
+      // Fetch the newly created permission with details
+      const newPermission = await query(`
+        SELECT 
+          rp.id,
+          rp.role_id,
+          rp.permission_id,
+          p.code as permission_code,
+          p.label as permission_label,
+          p.entity_code,
+          p.action,
+          p.description as permission_description,
+          p.status_id as permission_status_id,
+          rp.created_at,
+          rp.modified_at
+        FROM roles_permissions rp
+        INNER JOIN permissions p ON rp.permission_id = p.id
+        WHERE rp.id = $1
+      `, [result.rows[0].id]);
+
+      return {
+        success: true,
+        message: 'Permission enabled for this role',
+        data: newPermission.rows[0]
+      };
+    } else {
+      // Disable: Delete from roles_permissions
+      const result = await query(`
+        DELETE FROM roles_permissions
+        WHERE role_id = $1 AND permission_id = $2
+        RETURNING *
+      `, [roleId, permissionId]);
+
+      if (result.rows.length === 0) {
+        throw {
+          statusCode: 404,
+          message: 'Role permission not found or already disabled'
+        };
+      }
+
+      return {
+        success: true,
+        message: 'Permission disabled for this role',
+        data: result.rows[0]
+      };
+    }
+  } catch (error: any) {
+    if (error.statusCode) {
+      throw error;
+    }
+
+    if (error.code === '23503') { // Foreign key violation
+      throw {
+        statusCode: 400,
+        message: 'Invalid role or permission'
+      };
+    }
+
+    throw {
+      statusCode: 500,
+      message: 'Failed to update role permission status',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+}
+
