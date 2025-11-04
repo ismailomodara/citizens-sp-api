@@ -45,7 +45,9 @@ export enum Statuses {
   ENABLED,
   DISABLED,
   CONFIRMED,
-  INVITED
+  INVITED,
+  LOGGED,
+  SUBMITTED
 }
 
 export interface Status {
@@ -298,4 +300,31 @@ export interface UpdateCitizenPayload {
   country_code?: string;
   status_id?: number;
   locale_id?: string;
+}
+
+export interface Request {
+  id: string; // UID
+  title: string;
+  description: string;
+  citizen_id: number;
+  assigned_admin_id: number;
+  status_id: number;
+  created_at: Date;
+  modified_at: Date;
+}
+
+export interface CreateRequestPayload {
+  title: string;
+  description: string;
+  citizen_id: number;
+  assigned_admin_id?: number;
+  status_id?: number;
+}
+
+export interface UpdateRequestPayload {
+  title?: string;
+  description?: string;
+  citizen_id?: number;
+  assigned_admin_id?: number;
+  status_id?: number;
 }
