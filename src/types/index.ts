@@ -303,11 +303,11 @@ export interface UpdateCitizenPayload {
 }
 
 export interface Request {
-  id: string; // UID
+  id: string; // UUID
   title: string;
   description: string;
-  citizen_id: number;
-  assigned_admin_id: number;
+  citizen_id: string; // UUID
+  assigned_admin_id: string | null; // UUID
   status_id: number;
   created_at: Date;
   modified_at: Date;
@@ -316,15 +316,15 @@ export interface Request {
 export interface CreateRequestPayload {
   title: string;
   description: string;
-  citizen_id: number;
-  assigned_admin_id?: number;
+  citizen_id: string; // UUID
+  assigned_admin_id?: string; // UUID
   status_id?: number;
 }
 
 export interface UpdateRequestPayload {
   title?: string;
   description?: string;
-  citizen_id?: number;
-  assigned_admin_id?: number;
+  citizen_id?: string; // UUID
+  assigned_admin_id?: string | null; // UUID
   status_id?: number;
 }

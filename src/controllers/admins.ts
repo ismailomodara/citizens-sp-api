@@ -60,12 +60,12 @@ export async function pluck(id: string): Promise<ApiResponse<Admin>> {
  */
 export async function store(input: CreateAdminPayload): Promise<ApiResponse<Admin>> {
   try {
-    const { email, password, firstname, lastname, country, role_id, locale_id, status_id } = input;
+    const { email, password, firstname, lastname, country_code, role_id, locale_id, status_id } = input;
     
     // Validation
     if (!email) throw { statusCode: 400, message: 'Email is required'};
     if (!password) throw { statusCode: 400, message: 'Password is required'};
-    if (!country) throw { statusCode: 400, message: 'Country is required'};
+    if (!country_code) throw { statusCode: 400, message: 'Country is required'};
 
     // Validate email format (basic check)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -84,7 +84,7 @@ export async function store(input: CreateAdminPayload): Promise<ApiResponse<Admi
       };
     }
     
-    if (!country || country.length !== 3) {
+    if (!country_code || country_code.length !== 3) {
       throw {
         statusCode: 400,
         message: 'Country must be a valid ISO3 code (3 characters)'
@@ -129,7 +129,7 @@ export async function store(input: CreateAdminPayload): Promise<ApiResponse<Admi
     
     const result = await query<Admin>(
       'INSERT INTO citizens (email, password, firstname, lastname, country, role_id, status_id, locale_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-      [email.toLowerCase(), hashedPassword, firstname || null, lastname || null, country.toUpperCase(), role_id, status_id || Statuses.ENABLED, locale_id || Locales.ENGLISH]
+      [email.toLowerCase(), hashedPassword, firstname || null, lastname || null, country_code.toUpperCase(), role_id, status_id || Statuses.ENABLED, locale_id || Locales.ENGLISH]
     );
     
     return {
@@ -187,7 +187,7 @@ export async function store(input: CreateAdminPayload): Promise<ApiResponse<Admi
  */
 export async function update(id: string, input: UpdateAdminPayload): Promise<ApiResponse<Admin>> {
   try {
-    const { password, firstname, lastname, country, status_id, locale_id } = input;
+    const { password, firstname, lastname, country_code, status_id, locale_id } = input;
     
     const updates: string[] = [];
     const values: any[] = [];
@@ -215,15 +215,15 @@ export async function update(id: string, input: UpdateAdminPayload): Promise<Api
       updates.push(`lastname = $${paramCount++}`);
       values.push(lastname);
     }
-    if (country !== undefined) {
-      if (country.length !== 3) {
+    if (country_code !== undefined) {
+      if (country_code.length !== 3) {
         throw {
           statusCode: 400,
           message: 'Country must be a valid ISO3 code (3 characters)'
         };
       }
       updates.push(`country = $${paramCount++}`);
-      values.push(country.toUpperCase());
+      values.push(country_code.toUpperCase());
     }
 
     if (status_id !== undefined) {
