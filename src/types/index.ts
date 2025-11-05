@@ -10,6 +10,22 @@ export interface EnvConfig {
   DB_POOL_CONNECTION_TIMEOUT?: string;
 }
 
+/**
+ * Extended FastifyRequest interface for authenticated requests
+ * This is populated by authentication/permission middleware
+ */
+declare module 'fastify' {
+  interface FastifyRequest {
+    admin?: {
+      id: string;
+      role_id: number;
+      email?: string;
+      firstname?: string;
+      lastname?: string;
+    };
+  }
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
