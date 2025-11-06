@@ -42,11 +42,11 @@ async function runMigration(migrationName: string, sql: string): Promise<void> {
     );
     
     await client.query('COMMIT');
-    console.log(`✓ Migration ${migrationName} executed successfully`);
+    console.log(`✅ Migration ${migrationName} executed successfully`);
   } catch (error) {
     await client.query('ROLLBACK');
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error(`✗ Migration ${migrationName} failed:`, errorMessage);
+    console.error(`❌ Migration ${migrationName} failed:`, errorMessage);
     throw error;
   } finally {
     client.release();
@@ -55,7 +55,7 @@ async function runMigration(migrationName: string, sql: string): Promise<void> {
 
 async function runMigrations(): Promise<void> {
   try {
-    console.log('Starting migrations...');
+    console.log('Starting migrations...⏳');
     
     await ensureMigrationsTable();
     
@@ -79,7 +79,7 @@ async function runMigrations(): Promise<void> {
       await runMigration(migrationName, sql);
     }
     
-    console.log('All migrations completed successfully!');
+    console.log('All migrations completed successfully! ✅');
   } catch (error) {
     console.error('Migration error:', error);
     process.exit(1);

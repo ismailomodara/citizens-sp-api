@@ -12,13 +12,14 @@ INSERT INTO entities (label, code, description) VALUES
   ('Statuses', 'entity.statuses', 'The statuses entity'),
   ('Services', 'entity.services', 'The services entity'),
   ('Locales', 'entity.locales', 'The locales entity'),
-  ('Citizens', 'entity.citizens', 'The citizens entity'),
   ('Roles', 'entity.roles', 'The roles entity'),
   ('Permissions', 'entity.permissions', 'The permissions entity'),
   ('Roles Permissions', 'entity.roles_permissions', 'The role permissions entity'),
   ('Admins', 'entity.admins', 'The admins entity'),
+  ('Countries', 'entity.countries', 'The countries entity'),
   ('Ministries', 'entity.ministries', 'The ministries entity'),
   ('Ministries Admins', 'entity.ministries_admins', 'The ministries admins entity'),
+  ('Citizens', 'entity.citizens', 'The citizens entity'),
   ('Requests', 'entity.requests', 'The requests entity')
 ON CONFLICT (id) DO UPDATE SET
   label = EXCLUDED.label,

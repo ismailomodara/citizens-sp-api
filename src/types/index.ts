@@ -10,12 +10,43 @@ export interface EnvConfig {
   DB_POOL_CONNECTION_TIMEOUT?: string;
 }
 
+/**
+ * Extended FastifyRequest interface for authenticated requests
+ * This is populated by authentication/permission middleware
+ */
+declare module 'fastify' {
+  interface FastifyRequest {
+    admin?: {
+      id: string;
+      role_id: number;
+      email?: string;
+      firstname?: string;
+      lastname?: string;
+    };
+  }
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
   message?: string;
   count?: number;
+}
+
+export enum Entities {
+  STATUSES = 'entity.statuses',
+  SERVICES = 'entity.services',
+  LOCALES = 'entity.locales',
+  ROLES = 'entity.roles',
+  PERMISSIONS = 'entity.permissions',
+  ROLES_PERMISSIONS = 'entity.roles_permissions',
+  ADMINS = 'entity.admins',
+  COUNTRIES = 'entity.countries',
+  MINISTRIES = 'entity.ministries',
+  MINISTRIES_ADMINS = 'entity.ministries_admins',
+  CITIZENS = 'entity.citizens',
+  REQUESTS = 'entity.requests'
 }
 
 export enum Statuses {
@@ -30,7 +61,9 @@ export enum Statuses {
   ENABLED,
   DISABLED,
   CONFIRMED,
-  INVITED
+  INVITED,
+  LOGGED,
+  SUBMITTED
 }
 
 export interface Status {
@@ -38,7 +71,7 @@ export interface Status {
   label: string;
   code: string;
   description: string | null;
-  color: string | null;
+  color: string | 'info';
   created_at: Date;
   updated_at: Date;
 }
@@ -63,8 +96,8 @@ export interface Service {
   id: number;
   label: string;
   code: string;
-  status_id: number
   description: string | null;
+  status_id: number
   created_at: Date;
   updated_at: Date;
 }
@@ -73,7 +106,7 @@ export interface CreateServicePayload {
   label: string;
   code: string;
   description?: string;
-  status_id: number
+  status_id?: number
 }
 
 export interface UpdateServicePayload {
@@ -102,7 +135,7 @@ export interface CreateLocalePayload {
   label: string;
   code: string;
   description?: string;
-  status_id: number
+  status_id?: number
 }
 
 export interface UpdateLocalePayload {
@@ -112,40 +145,10 @@ export interface UpdateLocalePayload {
   status_id?: number
 }
 
-export interface Citizen {
-  id: string; // UID
-  email: string;
-  password: string;
-  firstname: string;
-  lastname: string;
-  country: string;
-  status_id: number;
-  locale_id: number;
-  created_at: Date;
-  modified_at: Date;
-}
-
-export interface CreateCitizenPayload {
-  email: string;
-  password: string;
-  firstname?: string;
-  lastname?: string;
-  country: string;
-  status_id: number;
-  locale_id: string;
-}
-
-export interface UpdateCitizenPayload {
-  password?: string;
-  firstname?: string;
-  lastname?: string;
-  country?: string;
-  status_id?: number;
-  locale_id?: string;
-}
-
 export enum Roles {
   SYSTEM_ADMIN = 1,
+  REGIONAL_ADMIN ,
+  ADMIN,
   SENIOR_OFFICER ,
   OFFICER_LEVEL_2,
   OFFICER_LEVEL_1
@@ -229,7 +232,7 @@ export interface Admin {
   password: string;
   firstname: string;
   lastname: string;
-  country: string;
+  country_code: string;
   role_id: number;
   locale_id: number;
   status_id: number;
@@ -242,7 +245,7 @@ export interface CreateAdminPayload {
   password: string;
   firstname?: string;
   lastname?: string;
-  country: string;
+  country_code: string;
   role_id: number;
   locale_id: string;
   status_id: number;
@@ -252,8 +255,92 @@ export interface UpdateAdminPayload {
   password?: string;
   firstname?: string;
   lastname?: string;
-  country?: string;
+  country_code?: string;
   role_id?: number;
   locale_id?: string;
+  status_id?: number;
+}
+
+export interface Country {
+  id: string; // UID
+  name: string;
+  code: string;
+  description: string;
+  status_id: number;
+  creator_admin_id: number;
+  assigned_admin_id: number;
+  created_at: Date;
+  modified_at: Date;
+}
+
+export interface CreateCountryPayload {
+  name: string;
+  code: string;
+  description: string;
+  creator_admin_id: number;
+  assigned_admin_id: number | null;
+}
+
+export interface UpdateCountryPayload {
+  description?: string;
+  assigned_admin_id?: number | null;
+}
+
+export interface Citizen {
+  id: string; // UID
+  email: string;
+  password: string;
+  firstname: string;
+  lastname: string;
+  country_code: string;
+  status_id: number;
+  locale_id: number;
+  created_at: Date;
+  modified_at: Date;
+}
+
+export interface CreateCitizenPayload {
+  email: string;
+  password: string;
+  firstname?: string;
+  lastname?: string;
+  country_code: string;
+  status_id: number;
+  locale_id: string;
+}
+
+export interface UpdateCitizenPayload {
+  password?: string;
+  firstname?: string;
+  lastname?: string;
+  country_code?: string;
+  status_id?: number;
+  locale_id?: string;
+}
+
+export interface Request {
+  id: string; // UUID
+  title: string;
+  description: string;
+  citizen_id: string; // UUID
+  assigned_admin_id: string | null; // UUID
+  status_id: number;
+  created_at: Date;
+  modified_at: Date;
+}
+
+export interface CreateRequestPayload {
+  title: string;
+  description: string;
+  citizen_id: string; // UUID
+  assigned_admin_id?: string; // UUID
+  status_id?: number;
+}
+
+export interface UpdateRequestPayload {
+  title?: string;
+  description?: string;
+  citizen_id?: string; // UUID
+  assigned_admin_id?: string | null; // UUID
   status_id?: number;
 }
