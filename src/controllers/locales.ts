@@ -6,7 +6,9 @@ import {Locale, CreateLocalePayload, UpdateLocalePayload, ApiResponse, Statuses}
  */
 export async function index(): Promise<ApiResponse<Locale[]>> {
   try {
-    const result = await query<Locale>('SELECT * FROM locales ORDER BY id');
+    // Admin response - all locales
+    // const result = await query<Locale>('SELECT * FROM locales ORDER BY id');
+    const result = await query<Locale>('SELECT label, code, description FROM locales WHERE status_id = $1 ORDER BY id', [Statuses.ENABLED]);
     return {
       success: true,
       data: result.rows,
@@ -165,39 +167,6 @@ export async function update(id: string, input: UpdateLocalePayload): Promise<Ap
     throw {
       statusCode: 500,
       message: 'Failed to update locale',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    };
-  }
-}
-
-/**
- * Delete a status
- */
-export async function destroy(id: string): Promise<ApiResponse<Locale>> {
-  try {
-    const result = await query<Locale>('DELETE FROM locales WHERE id = $1 RETURNING *', [id]);
-
-    if (result.rows.length === 0) {
-      throw {
-        statusCode: 404,
-        message: 'Locale not found'
-      };
-    }
-
-    return {
-      success: true,
-      message: 'Locale deleted successfully',
-      data: result.rows[0]
-    };
-  } catch (error: any) {
-    // Re-throw if it's already our formatted error
-    if (error.statusCode) {
-      throw error;
-    }
-
-    throw {
-      statusCode: 500,
-      message: 'Failed to delete Locale',
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }

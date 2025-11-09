@@ -6,7 +6,7 @@ import { Status, ApiResponse } from '../types';
  */
 export async function index(): Promise<ApiResponse<Status[]>> {
   try {
-    const result = await query<Status>('SELECT * FROM statuses ORDER BY id');
+    const result = await query<Status>('SELECT label, code, description, color FROM statuses ORDER BY id');
     return {
       success: true,
       data: result.rows,

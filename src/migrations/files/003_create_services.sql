@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS services (
   label VARCHAR(64) NOT NULL,
   code VARCHAR(64) NOT NULL UNIQUE,
   description TEXT,
-  status_id INTEGER NOT NULL DEFAULT 1,
+  status_id INTEGER NOT NULL DEFAULT 9,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_services_status FOREIGN KEY (status_id) REFERENCES statuses(id)
@@ -13,19 +13,19 @@ CREATE TABLE IF NOT EXISTS services (
 -- Insert initial statuses based on Statuses enum
 -- Ids map to Statuses Enum in Types
 INSERT INTO services (label, code, description) VALUES
-   ('Education', 'education', 'The education sector'),
-   ('Housing', 'housing', 'The housing sector'),
-   ('Electricity', 'electricity', 'The electricity sector'),
-   ('Food', 'food', 'The food sector'),
-   ('Healthcare', 'healthcare', 'The healthcare sector'),
-   ('Transportation', 'transportation',  'The transportation sector'),
-   ('Utilities', 'utilities', 'The utilities sector'),
-   ('Police', 'police', 'The police sector'),
-   ('Legal', 'legal', 'The legal sector'),
-   ('Social Services', 'social_services', 'The social services sector'),
-   ('Military', 'military', 'The military sector'),
-   ('Tax', 'tax', 'The tax sector'),
-   ('Others', 'others', 'The others sector')
+   ('Education', 'services.education', 'The education sector'),
+   ('Housing', 'services.housing', 'The housing sector'),
+   ('Electricity', 'services.electricity', 'The electricity sector'),
+   ('Food', 'services.food', 'The food sector'),
+   ('Healthcare', 'services.healthcare', 'The healthcare sector'),
+   ('Transportation', 'services.transportation',  'The transportation sector'),
+   ('Utilities', 'services.utilities', 'The utilities sector'),
+   ('Police', 'services.police', 'The police sector'),
+   ('Legal', 'services.legal', 'The legal sector'),
+   ('Social Services', 'services.social_services', 'The social services sector'),
+   ('Military', 'services.military', 'The military sector'),
+   ('Tax', 'services.tax', 'The tax sector'),
+   ('Others', 'services.others', 'The others sector')
 ON CONFLICT (id) DO UPDATE SET
     label = EXCLUDED.label,
     code = EXCLUDED.code,

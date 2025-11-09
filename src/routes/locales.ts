@@ -3,8 +3,7 @@ import {
   index,
   pluck,
   store,
-  update,
-  destroy
+  update
 } from '../controllers/locales';
 import { CreateLocalePayload, UpdateLocalePayload, ApiResponse, Locale } from '../types';
 import { asyncHandler } from '../utils/errorHandler';
@@ -61,19 +60,6 @@ export async function localesRoutes(fastify: FastifyInstance) {
     asyncHandler(async (request: FastifyRequest<{ Params: LocaleParams; Body: UpdateLocalePayload }>, reply: FastifyReply) => {
       const { id } = request.params;
       const result = await update(id, request.body);
-      return reply.code(200).send(result);
-    })
-  );
-
-  // Delete a locale
-  fastify.delete<{
-    Params: LocaleParams;
-    Reply: ApiResponse<Locale>;
-  }>(
-    '/locales/:id',
-    asyncHandler(async (request: FastifyRequest<{ Params: LocaleParams }>, reply: FastifyReply) => {
-      const { id } = request.params;
-      const result = await destroy(id);
       return reply.code(200).send(result);
     })
   );
